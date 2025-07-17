@@ -204,6 +204,15 @@
     setupAllEditors();
   }
 
+  function setupAllEditors() {
+    loadGrammarContent();
+    loadCQ();
+    loadProblems();
+    loadMCQs();
+    loadToppers();
+    setupEditorVisibility();
+  }
+
   // Escape HTML helper
   function escapeHtml(text) {
     const map = {
@@ -304,7 +313,6 @@
       problemSelect.appendChild(option);
     });
 
-    // Show admin answer section only if logged in as admin
     if (sessionStorage.getItem('loggedInUser') === 'admin') {
       adminAnswerSection.style.display = 'block';
     } else {
@@ -377,7 +385,6 @@
     });
     submitMCQBtn.style.display = 'inline-block';
 
-    // Show admin MCQ editor only if admin
     if(sessionStorage.getItem('loggedInUser') === 'admin'){
       mcqEditor.style.display = 'block';
       saveMCQBtn.style.display = 'inline-block';
@@ -419,6 +426,6 @@
         alert('Each MCQ line must have 6 parts separated by |');
         return;
       }
-      const question = parts[0];
-      const options = parts.slice(1, 5);
-      const correct = parseInt
+      const question = parts[0].trim();
+      const options = parts.slice(1, 5).map(opt => opt.trim());
+      const correct = parseInt(parts[5].trim
