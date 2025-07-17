@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zahid's English Killers</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f9f9f9; margin:0; padding:0; }
+  #authSection, #mainContent {
+    max-width: 900px; margin: 50px auto; background: white; padding: 20px 30px;
+    border-radius: 8px; box-shadow: 0 0 12px rgba(0,0,0,0.15);
+  }
+  #mainContent { display: none; }
+  input, button, textarea {
+    display: block; width: 100%; margin: 10px 0 20px; padding: 12px;
+    font-size: 16px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;
+  }
+  button {
+    background: #2c3e50; color: white; border: none; cursor: pointer;
+  }
+  button:hover { background: #1f2a38; }
+  nav {
+    background: #34495e; display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;
+  }
+  nav a {
+    color: white; padding: 15px 20px; text-decoration: none; font-weight: bold; cursor: pointer;
+  }
+  nav a:hover { background: #2c3e50; }
+  footer {
+    text-align: center; margin-top: 40px; color: #555;
+  }
+  .section {
+    /* Common styles for sections */
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN FORM -->
+<div id="authSection">
+  <h2>Zahid's English Killers - Login</h2>
+  <input type="text" id="loginUsername" placeholder="Enter your username" />
+  <input type="password" id="loginPassword" placeholder="Enter password" />
+  <button onclick="login()">Login</button>
+  <p>Password is <strong>"Zahid Sir"</strong> for all users.</p>
+  <p><strong>Note:</strong> To edit Grammar or CQ, login as <em>admin</em> (username: admin)</p>
+</div>
+
+<!-- MAIN WEBSITE CONTENT -->
+<div id="mainContent">
+  <nav>
+    <a href="#home" onclick="navigate(event, 'home')">Home</a>
+    <a href="#grammar" onclick="navigate(event, 'grammar')">Grammar</a>
+    <a href="#cq" onclick="navigate(event, 'cq')">CQ Practice</a>
+    <a href="#pdf" onclick="navigate(event, 'pdf')">Important PDFs</a>
+    <a href="#problem" onclick="navigate(event, 'problem')">Problem Solving</a>
+    <a href="#mcq" onclick="navigate(event, 'mcq')">MCQ Test</a>
+    <a href="#topper-list" onclick="navigate(event, 'topper-list')">Topper List</a>
+    <a href="#video-lectures" onclick="navigate(event, 'video-lectures')">Video Lectures</a>
+    <a href="#homework" onclick="navigate(event, 'homework')">Homework</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+
+  <section id="home" class="section" style="display:block;">
+    <h2>Welcome to Zahid’s English Killers</h2>
+    <p>Master English Grammar from Class 9 to 12 for SSC and HSC.</p>
+  </section>
+
+  <section id="grammar" class="section" style="display:none;">
+    <h2>Grammar Topics</h2>
+    <textarea id="grammarEditor" rows="12" style="width:100%; display:none;"></textarea>
+    <button id="saveGrammarBtn" style="display:none;">Save Grammar Content</button>
+    <div id="grammarContent" style="border:1px solid #ccc; padding:15px; min-height:150px; white-space: pre-wrap;"></div>
+  </section>
+
+  <!-- CQ Practice Section -->
+  <section id="cq" class="section" style="display:none;">
+    <h2>CQ Practice</h2>
+    <textarea id="cqEditor" rows="10" style="width:100%; display:none;"></textarea>
+    <button id="saveCQBtn" style="display:none;">Save CQ Questions</button>
+    <div id="cqContent" style="border:1px solid #ccc; padding:15px; min-height:150px; white-space: pre-wrap;"></div>
+  </section>
+
+  <!-- Problem Solving Section -->
+  <section id="problem" class="section" style="display:none;">
+    <h2>Problem Solving</h2>
+    <textarea id="problemInput" placeholder="Write your problem here..."></textarea>
+    <button onclick="submitProblem()">Submit Problem</button>
+    <ul id="problemList" style="padding: 0; list-style: none;"></ul>
+  </section>
+
+</div>
+
+<script>
+  const CORRECT_PASSWORD = 'Zahid Sir';
+
+  function isLoggedIn() {
+    return sessionStorage.getItem('loggedInUser') !== null;
+  }
+
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(sec => {
+      sec.style.display = 'none';
+    });
+    const sel = document.getElementById(sectionId);
+    if (sel) sel.style.display = 'block';
+  }
+
+  function showLoginForm() {
+    document.getElementById('authSection').style.display = 'block';
+    document.getElementById('mainContent').style.display = 'none';
+  }
+
+  function showMainContent() {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    showSection('home');
+  }
+
+  function login() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    if (!username) {
+      alert('Please enter your username');
+      return;
+    }
+    if (password !== CORRECT_PASSWORD) {
+      alert('Incorrect password');
+      return;
+    }
+    sessionStorage.setItem('loggedInUser', username);
+    alert(`Welcome, ${username}! You are logged in.`);
+    showMainContent();
+    clearLoginForm();
+  }
+
+  function clearLoginForm() {
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+  }
+
+  function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+      sessionStorage.removeItem('loggedInUser');
+      showLoginForm();
+    }
+  }
+
+  // Navigation handler
+  function navigate(e, sectionId) {
+    e.preventDefault();
+    if (!isLoggedIn()) {
+      alert('Please login first.');
+      showLoginForm();
+      return;
+    }
+    if(sectionId === 'grammar'){
+      openGrammar();
+    } else if(sectionId === 'cq'){
+      openCQ();
+    } else if(sectionId === 'problem'){
+      loadProblems();
+      showSection('problem');
+    } else {
+      showSection(sectionId);
+    }
+  }
+
+  // Grammar content edit logic
+  const grammarEditor = document.getElementById('grammarEditor');
+  const saveGrammarBtn = document.getElementById('saveGrammarBtn');
+  const grammarContent = document.getElementById('grammarContent');
+
+  function loadGrammarContent() {
+    let content = localStorage.getItem('grammarContent') || 'Grammar content will appear here...';
+    grammarContent.innerText = content;
+    grammarEditor.value = content;
+  }
+
+  function setupGrammarEditor() {
+    const user = sessionStorage.getItem('loggedInUser');
+    if(user === 'admin') {
+      grammarEditor.style.display = 'block';
+      saveGrammarBtn.style.display = 'inline-block';
+      grammarContent.style.display = 'none';
+    } else {
+      grammarEditor.style.display = 'none';
+      saveGrammarBtn.style.display = 'none';
+      grammarContent.style.display = 'block';
+    }
+  }
+
+  saveGrammarBtn.onclick = function() {
+    const newContent = grammarEditor.value;
+    localStorage.setItem('grammarContent', newContent);
+    alert('Grammar content saved!');
+    loadGrammarContent();
+    setupGrammarEditor();
+  }
+
+  function openGrammar() {
+    loadGrammarContent();
+    setupGrammarEditor();
+    showSection('grammar');
+  }
+
+  // CQ Section JS
+  const cqEditor = document.getElementById('cqEditor');
+  const saveCQBtn = document.getElementById('saveCQBtn');
+  const cqContent = document.getElementById('cqContent');
+
+  function loadCQ() {
+    let cq = localStorage.getItem('cqContent') || 'Write CQ questions here...';
+    cqContent.innerText = cq;
+    cqEditor.value = cq;
+  }
+
+  function setupCQEditor() {
+    const user = sessionStorage.getItem('loggedInUser');
+    if(user === 'admin'){
+      cqEditor.style.display = 'block';
+      saveCQBtn.style.display = 'inline-block';
+      cqContent.style.display = 'none';
+    } else {
+      cqEditor.style.display = 'none';
+      saveCQBtn.style.display = 'none';
+      cqContent.style.display = 'block';
+    }
+  }
+
+  saveCQBtn.onclick = function() {
+    const newCQ = cqEditor.value;
+    localStorage.setItem('cqContent', newCQ);
+    alert('CQ questions saved!');
+    loadCQ();
+    setupCQEditor();
+  }
+
+  function openCQ() {
+    loadCQ();
+    setupCQEditor();
+    showSection('cq');
+  }
+
+  // Problem Solving logic
+  function submitProblem() {
+    const input = document.getElementById('problemInput');
+    const problem = input.value.trim();
+    if (!problem) return alert('Please write your problem first.');
+    const problems = JSON.parse(localStorage.getItem('problems') || '[]');
+    problems.push(problem);
+    localStorage.setItem('problems', JSON.stringify(problems));
+    input.value = '';
+    loadProblems();
+  }
+
+  function loadProblems() {
+    const list = document.getElementById('problemList');
+    const problems = JSON.parse(localStorage.getItem('problems') || '[]');
+    list.innerHTML = '';
+    problems.forEach((p, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${p} <button onclick="deleteProblem(${i})" style="float:right;">❌</button>`;
+      li.style.padding = '8px';
+      li.style.borderBottom = '1px solid #ccc';
+      list.appendChild(li);
+    });
+  }
+
+  function deleteProblem(index) {
+    const problems = JSON.parse(localStorage.getItem('problems') || '[]');
+    problems.splice(index, 1);
+    localStorage.setItem('problems', JSON.stringify(problems));
+    loadProblems();
+  }
+
+  // Initial load
+  if(!isLoggedIn()) {
+    showLoginForm();
+  } else {
+    showMainContent();
+  }
+</script>
+
+</body>
+</html>
