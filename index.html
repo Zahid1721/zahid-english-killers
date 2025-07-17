@@ -15,6 +15,7 @@
     display: block; width: 100%; margin: 10px 0 20px; padding: 12px;
     font-size: 16px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;
   }
+  textarea { height: 200px; }
   button {
     background: #2c3e50; color: white; border: none; cursor: pointer;
   }
@@ -59,7 +60,43 @@
     <a href="#" onclick="logout()">Logout</a>
   </nav>
 
-  <!-- ... Sections remain same ... -->
+  <!-- CONTENT SECTIONS -->
+  <div class="section" id="home">
+    <h2>Welcome to Zahid's English Killers</h2>
+    <p>This is the home page.</p>
+  </div>
+
+  <div class="section" id="grammar">
+    <h2>Grammar Section</h2>
+    <textarea id="grammarEditor" placeholder="Write grammar content here..."></textarea>
+  </div>
+
+  <div class="section" id="cq">
+    <h2>CQ Practice</h2>
+    <textarea id="cqEditor" placeholder="Write CQ questions and answers here..."></textarea>
+  </div>
+
+  <div class="section" id="mcq">
+    <h2>MCQ Test</h2>
+    <textarea id="mcqEditor" placeholder="Write MCQs here..."></textarea>
+  </div>
+
+  <div class="section" id="problem">
+    <h2>Problem Solving</h2>
+    <textarea id="problemEditor" placeholder="Write problem-solving content here..."></textarea>
+  </div>
+
+  <div class="section" id="topper-list">
+    <h2>Topper List</h2>
+    <textarea id="topperEditor" placeholder="Write topper names and results here..."></textarea>
+  </div>
+
+  <div class="section" id="pdf">
+    <h2>Important PDFs</h2>
+    <input type="file" id="pdfUploader" multiple />
+    <ul id="pdfList"></ul>
+  </div>
+
 </div>
 
 <script>
@@ -69,10 +106,12 @@
     return sessionStorage.getItem('loggedInUser') !== null;
   }
 
+  function isAdmin() {
+    return sessionStorage.getItem('loggedInUser') === 'admin';
+  }
+
   function showSection(sectionId) {
-    document.querySelectorAll('.section').forEach(sec => {
-      sec.style.display = 'none';
-    });
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = 'none');
     const sel = document.getElementById(sectionId);
     if (sel) sel.style.display = 'block';
   }
@@ -92,14 +131,8 @@
   function login() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
-    if (!username) {
-      alert('Please enter your username');
-      return;
-    }
-    if (password !== CORRECT_PASSWORD) {
-      alert('Incorrect password');
-      return;
-    }
+    if (!username) return alert('Please enter your username');
+    if (password !== CORRECT_PASSWORD) return alert('Incorrect password');
     sessionStorage.setItem('loggedInUser', username);
     alert(`Welcome, ${username}! You are logged in.`);
     showMainContent();
@@ -126,30 +159,30 @@
       return;
     }
     showSection(sectionId);
-    if(sectionId === 'grammar') loadGrammarContent();
-    if(sectionId === 'cq') loadCQ();
-    if(sectionId === 'problem') loadProblems();
-    if(sectionId === 'mcq') loadMCQs();
-    if(sectionId === 'topper-list') loadToppers();
-    setupAllEditors();
   }
 
   function setupAllEditors() {
-    loadGrammarContent();
-    loadCQ();
-    loadProblems();
-    loadMCQs();
-    loadToppers();
-    setupEditorVisibility();
+    const editableIds = ['grammarEditor', 'cqEditor', 'mcqEditor', 'problemEditor', 'topperEditor'];
+    editableIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!isAdmin()) el.setAttribute('readonly', 'readonly');
+      else el.removeAttribute('readonly');
+    });
   }
 
-  // Auto show main content if logged in
+  document.getElementById('pdfUploader').addEventListener('change', function(e) {
+    const list = document.getElementById('pdfList');
+    list.innerHTML = '';
+    Array.from(e.target.files).forEach(file => {
+      const li = document.createElement('li');
+      li.textContent = file.name;
+      list.appendChild(li);
+    });
+  });
+
   window.onload = function () {
-    if (isLoggedIn()) {
-      showMainContent();
-    } else {
-      showLoginForm();
-    }
+    if (isLoggedIn()) showMainContent();
+    else showLoginForm();
   };
 </script>
 </body>
