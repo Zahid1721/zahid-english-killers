@@ -29,6 +29,9 @@
   footer {
     text-align: center; margin-top: 40px; color: #555;
   }
+  .section {
+    /* Common styles for sections */
+  }
 </style>
 </head>
 <body>
@@ -40,7 +43,7 @@
   <input type="password" id="loginPassword" placeholder="Enter password" />
   <button onclick="login()">Login</button>
   <p>Password is <strong>"Zahid Sir"</strong> for all users.</p>
-  <p><strong>Note:</strong> To edit Grammar, login as <em>admin</em> (username: admin)</p>
+  <p><strong>Note:</strong> To edit Grammar or CQ, login as <em>admin</em> (username: admin)</p>
 </div>
 
 <!-- MAIN WEBSITE CONTENT -->
@@ -65,14 +68,20 @@
 
   <section id="grammar" class="section" style="display:none;">
     <h2>Grammar Topics</h2>
-
     <textarea id="grammarEditor" rows="12" style="width:100%; display:none;"></textarea>
     <button id="saveGrammarBtn" style="display:none;">Save Grammar Content</button>
-
     <div id="grammarContent" style="border:1px solid #ccc; padding:15px; min-height:150px; white-space: pre-wrap;"></div>
   </section>
 
-  <!-- Other sections truncated for brevity... -->
+  <!-- CQ Practice Section -->
+  <section id="cq" class="section" style="display:none;">
+    <h2>CQ Practice</h2>
+    <textarea id="cqEditor" rows="10" style="width:100%; display:none;"></textarea>
+    <button id="saveCQBtn" style="display:none;">Save CQ Questions</button>
+    <div id="cqContent" style="border:1px solid #ccc; padding:15px; min-height:150px; white-space: pre-wrap;"></div>
+  </section>
+
+  <!-- Other sections can be added here -->
 
 </div>
 
@@ -141,37 +150,39 @@
     }
     if(sectionId === 'grammar'){
       openGrammar();
+    } else if(sectionId === 'cq'){
+      openCQ();
     } else {
       showSection(sectionId);
     }
   }
 
   // Grammar content edit logic
-  const editor = document.getElementById('grammarEditor');
-  const saveBtn = document.getElementById('saveGrammarBtn');
-  const displayDiv = document.getElementById('grammarContent');
+  const grammarEditor = document.getElementById('grammarEditor');
+  const saveGrammarBtn = document.getElementById('saveGrammarBtn');
+  const grammarContent = document.getElementById('grammarContent');
 
   function loadGrammarContent() {
     let content = localStorage.getItem('grammarContent') || 'Grammar content will appear here...';
-    displayDiv.innerText = content;
-    editor.value = content;
+    grammarContent.innerText = content;
+    grammarEditor.value = content;
   }
 
   function setupGrammarEditor() {
     const user = sessionStorage.getItem('loggedInUser');
     if(user === 'admin') {
-      editor.style.display = 'block';
-      saveBtn.style.display = 'inline-block';
-      displayDiv.style.display = 'none';
+      grammarEditor.style.display = 'block';
+      saveGrammarBtn.style.display = 'inline-block';
+      grammarContent.style.display = 'none';
     } else {
-      editor.style.display = 'none';
-      saveBtn.style.display = 'none';
-      displayDiv.style.display = 'block';
+      grammarEditor.style.display = 'none';
+      saveGrammarBtn.style.display = 'none';
+      grammarContent.style.display = 'block';
     }
   }
 
-  saveBtn.onclick = function() {
-    const newContent = editor.value;
+  saveGrammarBtn.onclick = function() {
+    const newContent = grammarEditor.value;
     localStorage.setItem('grammarContent', newContent);
     alert('Grammar content saved!');
     loadGrammarContent();
@@ -182,6 +193,51 @@
     loadGrammarContent();
     setupGrammarEditor();
     showSection('grammar');
+  }
+
+  // CQ Section JS
+  const cqEditor = document.getElementById('cqEditor');
+  const saveCQBtn = document.getElementById('saveCQBtn');
+  const cqContent = document.getElementById('cqContent');
+
+  function loadCQ() {
+    let cq = localStorage.getItem('cqContent') || 'Write CQ questions here...';
+    cqContent.innerText = cq;
+    cqEditor.value = cq;
+  }
+
+  function setupCQEditor() {
+    const user = sessionStorage.getItem('loggedInUser');
+    if(user === 'admin'){
+      cqEditor.style.display = 'block';
+      saveCQBtn.style.display = 'inline-block';
+      cqContent.style.display = 'none';
+    } else {
+      cqEditor.style.display = 'none';
+      saveCQBtn.style.display = 'none';
+      cqContent.style.display = 'block';
+    }
+  }
+
+  saveCQBtn.onclick = function() {
+    const newCQ = cqEditor.value;
+    localStorage.setItem('cqContent', newCQ);
+    alert('CQ questions saved!');
+    loadCQ();
+    setupCQEditor();
+  }
+
+  function openCQ() {
+    loadCQ();
+    setupCQEditor();
+    showSection('cq');
+  }
+
+  // Initial load
+  if(!isLoggedIn()) {
+    showLoginForm();
+  } else {
+    showMainContent();
   }
 </script>
 
